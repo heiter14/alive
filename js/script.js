@@ -38,7 +38,8 @@ async function updateRunningTime() {
 
 function getApiKey() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('apikey');
+    const apikeylocal = urlParams.get('apikey');
+    return  process.env.PIXABAY_API_KEY || apikeylocal;
 }
 
 const apiKey = getApiKey();
