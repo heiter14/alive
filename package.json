@@ -2,7 +2,7 @@
   "name": "alive",
   "version": "1.0.0",
   "description": "I'm Still Alive",
-  "main": "./js/bundle.js",
+  "main": "js/script.js",
   "scripts": {
     "build": "webpack --mode production"
   },
