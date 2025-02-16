@@ -4,7 +4,7 @@ const Dotenv = require('dotenv-webpack');
 module.exports = {
   entry: './js/script.js',
   output: {
-    filename: 'bundle.js',
+    filename: 'js/bundle.js',
     path: path.resolve(__dirname, ''),
   },
   plugins: [
