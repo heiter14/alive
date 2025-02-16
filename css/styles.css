@@ -15,7 +15,10 @@ body {
 }
 
 h1, #timer, #currentDateTime, .counter, footer {
-    text-shadow: 2px 2px 4px black;
+    text-shadow: 
+                1px 1px 0px #000, 
+                2px 2px 0px #000, 
+                3px 3px 0px #000
 }
 
 h1 {
@@ -34,9 +37,11 @@ h1 {
 }
 
 footer {
-    position: absolute;
-    bottom: 10px;
+    position: fixed;
+    bottom: 0;
     width: 100%;
-    font-size: 1em;
-    color: lightgray;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px 0;
 }
