@@ -3,9 +3,8 @@ function updateCurrentDateTime() {
     document.getElementById("currentDateTime").textContent = now.toLocaleString();
 }
 
-
 function updateTimer() {
-    const startDate = new Date("2022-02-24T00:04:21Z"); // Timer since 24.02.2022 04:21
+    const startDate = new Date("2022-02-24T02:04:21+02:00"); // Timer since 24.02.2022 04:21
     const now = new Date();
     const diff = now - startDate;
 
@@ -55,12 +54,15 @@ async function fetchImages(country) {
 
 // Set random background image and update description
 function setRandomBackground() {
-    if (images.length > 0) {
+    if (images.length) {
         const randomIndex = Math.floor(Math.random() * images.length);
         document.body.style.backgroundImage = `url(${images[randomIndex]})`;
-        document.getElementById('image-description').innerText = `Current Background: ${descriptions[randomIndex]}`;
+
+        // Process description to remove duplicates
+        const uniqueTags = Array.from(new Set(descriptions[randomIndex].split(', '))).join(', ');
+        document.getElementById('image-description').innerText = `Background: ${uniqueTags}`;
     } else {
-        console.error('No images available to set as background');
+        console.error('No images to set as background');
     }
 }
 
@@ -73,10 +75,10 @@ Promise.all(countries.map(fetchImages)).then(results => {
 });
 
 // Auto-refresh timers
-// setInterval(setRandomBackground, 10000);
 setInterval(updateCurrentDateTime, 1000);
 setInterval(updateTimer, 1000);
 setInterval(calculateMissedBirthdays, 1000);
+// setInterval(setRandomBackground, 10000);
 // setInterval(updateRunningTime, 5000);
 
 window.onload = () => {
