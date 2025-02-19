@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # Trigger deployment only from the main branch
 
 permissions:
   contents: write  # Allow deployment to gh-pages
@@ -18,12 +18,13 @@ jobs:
 
       - name: Inject API Key Directly into Deployed Files (Without Commit)
         run: |
-          mkdir -p deploy
-          cp -r * deploy/
-          sed -i "s|const apiKey = .*;|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" deploy/js/script.js
+          mkdir -p deploy  # Create a deploy folder for deployment
+          cp -r * deploy/  # Copy all project files to the deploy folder
+          # Replace the API key placeholder with the actual secret key in the deploy folder
+          sed -i "s|const apiKey = 'REPLACE_THIS';|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" deploy/js/script.js
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
-          folder: deploy  # Deploy only the modified files
+          branch: gh-pages  # Deployment branch
+          folder: deploy  # The folder with the modified files for deployment
