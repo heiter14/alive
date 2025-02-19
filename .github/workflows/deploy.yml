@@ -13,6 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Inject API Key into config.js
+      - name: Inject API Key Directly into script.js
         run: |
-          echo "const apiKey = '${{ secrets.PIXABAY_API_KEY }}';" > js/config.js
+          sed -i "s|const apiKey = .*;|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" js/script.js
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: .
