@@ -42,7 +42,7 @@ const images = [];
 const descriptions = [];
 
 async function fetchImages(country) {
-    const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${country}+landscape&per_page=10`);
+    const response = await fetch(`https://pixabay.com/api/?q=${country}+landscape&per_page=10`);
     const data = await response.json();
     return data.hits.map(hit => ({ url: hit.webformatURL, description: hit.tags }));
 }
