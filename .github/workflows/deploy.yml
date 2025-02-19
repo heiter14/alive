@@ -3,10 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Trigger deployment only from the main branch
+      - main  # Trigger on push to main branch
 
 permissions:
-  contents: write  # Allow deployment to gh-pages
+  contents: write  # Ensure proper permissions for deployment
 
 jobs:
   build:
@@ -16,15 +16,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Inject API Key Directly into Deployed Files (Without Commit)
+      - name: Inject API Key into Deployed Files
         run: |
-          mkdir -p deploy  # Create a deploy folder for deployment
-          cp -r * deploy/  # Copy all project files to the deploy folder
-          # Replace the API key placeholder with the actual secret key in the deploy folder
+          mkdir -p deploy
+          cp -r * deploy/
+          # Replace the placeholder with actual API key in deploy/js/script.js
           sed -i "s|const apiKey = 'REPLACE_THIS';|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" deploy/js/script.js
+
+      - name: Set up Git for deployment
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch --all
+
+      - name: Create gh-pages branch (if it doesn't exist)
+        run: |
+          git checkout --orphan gh-pages || true  # Create gh-pages branch if not exists
+          git rm -rf . || true  # Ensure no other files are in gh-pages branch
+          git add .  # Add the deploy folder files
+          git commit -m "Deploy to GitHub Pages"
+          git push origin gh-pages --force  # Force push to gh-pages branch
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages  # Deployment branch
-          folder: deploy  # The folder with the modified files for deployment
+          branch: gh-pages  # Ensure it's pushing to the correct branch
+          folder: deploy    # Folder to deploy
