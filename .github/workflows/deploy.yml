@@ -5,20 +5,25 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # Allow deployment to gh-pages
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Inject API Key Directly into script.js
+      - name: Inject API Key Directly into Deployed Files (Without Commit)
         run: |
-          sed -i "s|const apiKey = .*;|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" js/script.js
+          mkdir -p deploy
+          cp -r * deploy/
+          sed -i "s|const apiKey = .*;|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" deploy/js/script.js
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: .
+          folder: deploy  # Deploy only the modified files
