@@ -1,10 +1,11 @@
+const apiKey = "REPLACE_THIS"; // Will be replaced during GitHub Actions build
+
 function updateCurrentDateTime() {
-    const now = new Date();
-    document.getElementById("currentDateTime").textContent = now.toLocaleString();
+    document.getElementById("currentDateTime").textContent = new Date().toLocaleString();
 }
 
 function updateTimer() {
-    const startDate = new Date("2022-02-24T02:04:21+02:00"); // Timer since 24.02.2022 04:21
+    const startDate = new Date("2022-02-24T02:04:21+02:00");
     const now = new Date();
     const diff = now - startDate;
 
@@ -36,42 +37,21 @@ async function updateRunningTime() {
     }
 }
 
-async function getApiKey() {
-    return new Promise((resolve) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const apikeylocal = urlParams.get('apikey');
-
-        // Load API key from dynamically injected config.js
-        const script = document.createElement("script");
-        script.src = "js/config.js";
-        script.onload = () => {
-            resolve(typeof apiKey !== "undefined" ? apiKey : apikeylocal);
-        };
-        script.onerror = () => {
-            console.error("Failed to load API key from config.js");
-            resolve(apikeylocal);
-        };
-        document.head.appendChild(script);
-    });
-}
-
 const countries = ['Poland', 'Switzerland', 'Germany'];
 const images = [];
 const descriptions = [];
 
-async function fetchImages(country, apiKey) {
+async function fetchImages(country) {
     const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${country}+landscape&per_page=10`);
     const data = await response.json();
     return data.hits.map(hit => ({ url: hit.webformatURL, description: hit.tags }));
 }
 
-// Set random background image and update description
 function setRandomBackground() {
     if (images.length) {
         const randomIndex = Math.floor(Math.random() * images.length);
         document.body.style.backgroundImage = `url(${images[randomIndex]})`;
 
-        // Process description to remove duplicates
         const uniqueTags = Array.from(new Set(descriptions[randomIndex].split(', '))).join(', ');
         document.getElementById('image-description').innerText = `Background: ${uniqueTags}`;
     } else {
@@ -80,10 +60,8 @@ function setRandomBackground() {
 }
 
 async function initialize() {
-    const apiKey = await getApiKey();
-    console.log("API Key Loaded:", apiKey);
-
-    Promise.all(countries.map(country => fetchImages(country, apiKey))).then(results => {
+    console.log("Using API Key:", apiKey);
+    Promise.all(countries.map(fetchImages)).then(results => {
         results.flat().forEach(item => {
             images.push(item.url);
             descriptions.push(item.description);
@@ -91,18 +69,13 @@ async function initialize() {
         setRandomBackground();
     });
 
-    // Auto-refresh timers
     setInterval(updateCurrentDateTime, 1000);
     setInterval(updateTimer, 1000);
     setInterval(calculateMissedBirthdays, 1000);
-    // setInterval(setRandomBackground, 10000);
-    // setInterval(updateRunningTime, 5000);
 
     updateCurrentDateTime();
     updateTimer();
     calculateMissedBirthdays();
-    // updateRunningTime();
 }
 
-// Run initialization after window loads
 window.onload = initialize;
