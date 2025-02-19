@@ -1,4 +1,11 @@
-const apiKey = "REPLACE_THIS"; // Will be replaced during GitHub Actions build
+// Function to get the API key from the URL query parameters
+function getApiKeyFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('apikey');  // Get the value of the 'apikey' query parameter
+}
+
+// Use the API key from the URL or a default one if not provided
+const apiKey = getApiKeyFromUrl() || "REPLACE_THIS"; // Fallback to a default if key is not found in URL
 
 function updateCurrentDateTime() {
     document.getElementById("currentDateTime").textContent = new Date().toLocaleString();
@@ -42,7 +49,7 @@ const images = [];
 const descriptions = [];
 
 async function fetchImages(country) {
-    const response = await fetch(`https://pixabay.com/api/?q=${country}+landscape&per_page=10`);
+    const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${country}+landscape&per_page=10`);
     const data = await response.json();
     return data.hits.map(hit => ({ url: hit.webformatURL, description: hit.tags }));
 }
@@ -60,7 +67,7 @@ function setRandomBackground() {
 }
 
 async function initialize() {
-    console.log("Using API Key:", apiKey);
+    console.log("Using API Key:", apiKey);  // Log the API key for debugging purposes
     Promise.all(countries.map(fetchImages)).then(results => {
         results.flat().forEach(item => {
             images.push(item.url);
