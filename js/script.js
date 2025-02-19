@@ -36,18 +36,30 @@ async function updateRunningTime() {
     }
 }
 
-function getApiKey() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const apikeylocal = urlParams.get('apikey');
-    return  process.env.PIXABAY_API_KEY || apikeylocal;
+async function getApiKey() {
+    return new Promise((resolve) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const apikeylocal = urlParams.get('apikey');
+
+        // Load API key from dynamically injected config.js
+        const script = document.createElement("script");
+        script.src = "js/config.js";
+        script.onload = () => {
+            resolve(typeof apiKey !== "undefined" ? apiKey : apikeylocal);
+        };
+        script.onerror = () => {
+            console.error("Failed to load API key from config.js");
+            resolve(apikeylocal);
+        };
+        document.head.appendChild(script);
+    });
 }
 
-const apiKey = getApiKey();
 const countries = ['Poland', 'Switzerland', 'Germany'];
 const images = [];
 const descriptions = [];
 
-async function fetchImages(country) {
+async function fetchImages(country, apiKey) {
     const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${country}+landscape&per_page=10`);
     const data = await response.json();
     return data.hits.map(hit => ({ url: hit.webformatURL, description: hit.tags }));
@@ -67,24 +79,30 @@ function setRandomBackground() {
     }
 }
 
-Promise.all(countries.map(fetchImages)).then(results => {
-    results.flat().forEach(item => {
-        images.push(item.url);
-        descriptions.push(item.description);
+async function initialize() {
+    const apiKey = await getApiKey();
+    console.log("API Key Loaded:", apiKey);
+
+    Promise.all(countries.map(country => fetchImages(country, apiKey))).then(results => {
+        results.flat().forEach(item => {
+            images.push(item.url);
+            descriptions.push(item.description);
+        });
+        setRandomBackground();
     });
-    setRandomBackground();
-});
 
-// Auto-refresh timers
-setInterval(updateCurrentDateTime, 1000);
-setInterval(updateTimer, 1000);
-setInterval(calculateMissedBirthdays, 1000);
-// setInterval(setRandomBackground, 10000);
-// setInterval(updateRunningTime, 5000);
+    // Auto-refresh timers
+    setInterval(updateCurrentDateTime, 1000);
+    setInterval(updateTimer, 1000);
+    setInterval(calculateMissedBirthdays, 1000);
+    // setInterval(setRandomBackground, 10000);
+    // setInterval(updateRunningTime, 5000);
 
-window.onload = () => {
     updateCurrentDateTime();
     updateTimer();
     calculateMissedBirthdays();
     // updateRunningTime();
-};
+}
+
+// Run initialization after window loads
+window.onload = initialize;
