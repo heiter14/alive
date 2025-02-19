@@ -19,7 +19,9 @@ jobs:
       - name: Inject API Key into Deployed Files
         run: |
           mkdir -p deploy
-          cp -r * deploy/
+          # Copy everything from the root except the deploy folder itself
+          shopt -s extglob
+          cp -r !(deploy) deploy/
           # Replace the placeholder with actual API key in deploy/js/script.js
           sed -i "s|const apiKey = 'REPLACE_THIS';|const apiKey = '${{ secrets.PIXABAY_API_KEY }}';|" deploy/js/script.js
 
