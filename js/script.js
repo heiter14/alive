@@ -1,5 +1,5 @@
 //?apikey=&startdate=2022-02-24T00:04:21Z&bruder=4-14&muter=11-14&schwester=7-10
-const countries = ["Poland", "Switzerland", "Germany"];
+const defaultCountries = ["Poland", "Switzerland", "Germany"];
 const defaultStartDate = "2022-02-24T00:04:21Z";
 const defaultBirth = {
   Bruder: { month: 4, day: 14 },
@@ -33,12 +33,18 @@ function getBirthFromParams() {
   const startDate = urlParams.get("startdate") || defaultStartDate;
 
   const apikey = urlParams.get("apikey") || "";
-  return { apikey, birth, startDate };
+
+  const countries = countriesParam
+        ? countriesParam.split(",").map(c => c.trim()).filter(Boolean)
+        : [];
+
+  return { apikey, countries, birth, startDate };
 }
 
 const urlInitParams = getBirthFromParams();
 const birth = urlInitParams.birth;
 const startDate = new Date(urlInitParams.startDate || defaultStartDate);
+const countries = urlInitParams.countries || defaultCountries
 
 // Update current date and time
 function updateCurrentDateTime() {
