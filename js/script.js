@@ -12,25 +12,27 @@ const nameClassBlock = ".allcounters";
 function getBirthFromParams() {
   const urlParams = new URLSearchParams(window.location.search);
   const birth = {};
-  let startDate = defaultStartDate;
+  let hasAnyParam = false;
 
-  for (const key in defaultBirth) {
-    const value = urlParams.get(key);
-    if (value) {
-      const [month, day] = value.split("-").map(Number);
-      birth[key] = { month, day };
-    } else {
-      birth[key] = defaultBirth[key];
-    }
+  for (const [key, value] of urlParams.entries()) {
+      if (value && /^\d{1,2}-\d{1,2}$/.test(value)) {
+          const [month, day] = value.split("-").map(Number);
+          if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+              birth[key] = { month, day };
+              hasAnyParam = true;
+          }
+      }
   }
 
-  const startDateParam = urlParams.get("startdate");
-  if (startDateParam) {
-    startDate = startDateParam;
+  // Fallback to defaultBirth if no valid URL entries were found
+  if (!hasAnyParam) {
+      Object.assign(birth, defaultBirth);
   }
+
+  // Handle startDate param
+  const startDate = urlParams.get("startdate") || defaultStartDate;
 
   const apikey = urlParams.get("apikey") || "";
-
   return { apikey, birth, startDate };
 }
 
