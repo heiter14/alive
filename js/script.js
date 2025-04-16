@@ -34,6 +34,7 @@ function getBirthFromParams() {
 
   const apikey = urlParams.get("apikey") || "";
 
+  const countriesParam = urlParams.get("countries");
   const countries = countriesParam
         ? countriesParam.split(",").map(c => c.trim()).filter(Boolean)
         : [];
