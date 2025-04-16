@@ -45,7 +45,7 @@ function getBirthFromParams() {
 const urlInitParams = getBirthFromParams();
 const birth = urlInitParams.birth;
 const startDate = new Date(urlInitParams.startDate || defaultStartDate);
-const countries = urlInitParams.countries || defaultCountries
+const countries = urlInitParams.countries.length?  urlInitParams.countries: defaultCountries
 
 // Update current date and time
 function updateCurrentDateTime() {
